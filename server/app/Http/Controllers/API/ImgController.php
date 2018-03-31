@@ -31,10 +31,10 @@ class ImgController extends Controller
     public function addImgObjRel(Request $request) {
         foreach($request->input() as $img) {
             foreach($img['objects'] as $object) {
-                \App\Object::firstOrCreate(array( 'name' => $object ));
+                \App\AppObject::firstOrCreate(array( 'name' => $object ));
             }
             $imgId = $img['imgId'];
-            $objectIds = \App\Object::whereIn('name', $img['objects'])->pluck('id')->toArray();
+            $objectIds = \App\AppObject::whereIn('name', $img['objects'])->pluck('id')->toArray();
             foreach($objectIds as $objectId) {
                 ImgObject::firstOrCreate( array( 'img_id' => $imgId, 'obj_id' => $objectId ) );
             }
