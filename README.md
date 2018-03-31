@@ -7,7 +7,7 @@ An attempt to make a "CTRL-F" function for your home, made at LA Hacks 2018.
 The controller sends new images to server by using HTTP request.
 
 
-the path is `/img`.
+the path is `/api/img`.
 
 ### request
 the method is `POST`, the body is as following.
@@ -17,7 +17,7 @@ the method is `POST`, the body is as following.
     ip: string;
     deviceName: string;
     takeAt: number;
-}
+}[]
 ```
 `takenAt` should be unix timestamp in ms.
 `img` should be image in jpeg format, encoded in base64.
@@ -30,7 +30,7 @@ Generally, the img processing program send a HTTP request to retrieve the img it
 
 ### Retrieve the img from server
 
-the path is `/img`
+the path is `/api/img`
 
 #### request
 `GET`
@@ -44,7 +44,7 @@ the param should be `take_after` in unix timestamp in ms
 {
     id: string;
     img: string;
-    createdAt: number;
+    takenAt: number;
 }
 ```
 `img` is the base64 code of the img in jpeg format
@@ -52,7 +52,7 @@ the param should be `take_after` in unix timestamp in ms
 
 ### Update the related object of imgs
 
-the path is `/objects_of_imgs`
+the path is `/api/objects_of_imgs`
 
 #### request
 `POST`
@@ -66,3 +66,48 @@ _DONT_ send the raw img back, only send the img id back.
 
 #### response
 If the operation success the server will return a HTTP response with 200 code, and empty body.
+
+## How frontend talks to server
+
+The frontend should retrive the list of objects(for autocomplete) from server, as well as do the search.
+
+### Autocomplete objects
+the path is `/api/objects`
+
+#### request
+`GET`
+the query string should be `search`
+for example, if the frontend wants to ask for all the objects that contains 'a', the url should be
+```
+/objects?search=a
+```
+
+#### response
+```
+string[]
+```
+an array of the result
+
+### search
+the path is `/api/search`
+
+### request
+`POST`
+```
+{
+    objects: string[]
+}
+```
+
+### response
+```
+{
+    id: number,
+    img: string,
+    deviceName: string,
+    ip: string,
+    takenAt: number,
+}[]
+```
+`img` is the base64 code for the image in jpeg format
+`takenAt` is the unix timestamp in ms.

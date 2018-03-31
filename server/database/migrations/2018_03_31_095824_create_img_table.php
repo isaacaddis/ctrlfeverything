@@ -17,7 +17,8 @@ class CreateImgTable extends Migration
             $table->increments('id');
             $table->longText('img');
             $table->ipAddress('ip');
-            $table->timestamp('takenAt');
+            $table->unsignedBigInteger('takenAt');
+            $table->string('deviceName', 100);
             $table->timestamps();
         });
     }
