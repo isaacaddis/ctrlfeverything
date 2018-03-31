@@ -70,70 +70,100 @@ app.get('/api/img', function(req, res){
     }
   });
 });
-var id, img, createdAt,objects;
+
+var i = 0;
 function periodic() {
-  var stamp = String((new Date).getTime());
-  request({url:'lahackhack-199707.appspot.com/api/img', qs:"taken_after="+stamp}, function(err, response, body) {
-    if(err) { console.log(err); return; }
+  i+=1000;
+  var stamp = String(i);
+  var id;
+  var img
+  var data, createdAt;
+  var label;
+  var objects;
+  var final;
+  request({url:'https://lahackhack-199707.appspot.com/api/img', qs:{"taken_after":stamp}}, function(err, response, body) {
+    // if(err) { console.log(err); return; }
     console.log("Get response: " + response.statusCode);
     var json = JSON.parse(body);
-    id = json.id;
-    img = base64Image(json.img);
-    createdAt = json.createdAt;
-    objects =[];
-      client
-        .labelDetection(img)
-        .then(results => {
-        // res.write('<img width=200 src="' + img + '"><br>');
-          const labels = results[0].labelAnnotations;
-          console.log('Labels:'); 
-          labels.forEach(label => console.log(label));
-          labels.forEach(label => objects.push(label));
-          // res.end('</body></html>');
-        })
-        .catch(err => {
-          console.error('ERROR:', err);
-        }); 
+    // console.log(json);
+    var client = new vision.ImageAnnotatorClient();
+    data = json.data;
+    objects = [];
+    final = [];
+    for (var i in data) {
+        if (data.hasOwnProperty(i)) {
+         var temp = [];
+         id = data[i].id;
+         img= data[i].img;
+         createdAt = data[i].takenAt;
+         var buf = Buffer.from(img, 'base64');
+         client
+           .labelDetection(buf)
+           .then(results => {
+             const labels = results[0].labelAnnotations;
+             console.log('Labels:'); 
+             labels.forEach(label => console.log(label));
+             // labels.forEach(label => objects.push(label));
+             // // confirm later
+             // label = objects[3];
+             // console.log(label);
+             temp.push(id);
+             temp.push(label);
+             final.push(temp);
+           })
+           .catch(err => {
+             console.error('ERROR:', err);
+           }); 
+        }
+    }
+    console.log(id);
+    console.log(objects);
   });
-  var postData = querystring.stringify({data:JSON.stringify ({imgId:id,objects:objects})});
-  var options = {
-      hostname: 'lahackhack-199707.appspot.com',
-      method: 'POST',
-      path: '/api/objects_of_imgs',
-      headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Content-Length': Buffer.byteLength(postData)
-      }
-  };
-  var sendRequest = function(options)
-  {
-      that = this;
-      that.req = http.request(options,function(res)
-      {
-          // console.log("Request began");
-          var output = '';
-
-          res.on('data', function (chunk) {
-              output += chunk;
-          });
-
-          res.on('end', function () {
-              console.log(output);
-          });
-      });
-
-      that.req.on('error', function (err)
-      {
-          console.log("Server Error");
-          console.log('Error: ' + err.message);
-      });
-
-      that.req.write(postData);
-      that.req.end();
-  };
-
-  sendRequest(options);
 }
+//   for(var i in final){
+//     var id = final[i][0];
+//     var objects = final[i][1];
+  
+//   var postData = querystring.stringify({data:JSON.stringify ({imgId:id,objects:objects})});
+//   var options = {
+//       hostname: 'lahackhack-199707.appspot.com',
+//       method: 'POST',
+//       path: '/api/objects_of_imgs',
+//       headers: {
+//           'Content-Type': 'application/x-www-form-urlencoded',
+//           'Content-Length': Buffer.byteLength(postData)
+//       }
+//   };
+//   var sendRequest = function(options)
+//   {
+//       that = this;
+//       that.req = http.request(options,function(res)
+//       {
+//           // console.log("Request began");
+//           var output = '';
+
+//           res.on('data', function (chunk) {
+//               output += chunk;
+//           });
+
+//           res.on('end', function () {
+//               console.log(output);
+//           });
+//       });
+
+//       that.req.on('error', function (err)
+//       {
+//           console.log("Server Error");
+//           console.log('Error: ' + err.message);
+//       });
+
+//       that.req.write(postData);
+//       that.req.end();
+//   };
+
+//   sendRequest(options);
+// }
+// }
 setInterval(periodic, 1000); //time is in ms
 
 // app.post('/upload', upload.single('image'), function(req, res, next){
