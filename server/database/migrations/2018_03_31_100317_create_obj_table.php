@@ -15,7 +15,7 @@ class CreateObjTable extends Migration
     {
         Schema::create('obj', function (Blueprint $table) {
             $table->increments('id');
-            $table->
+            $table->string('name', 100);
             $table->timestamps();
         });
     }

@@ -14,8 +14,13 @@ class CreateImgObjTable extends Migration
     public function up()
     {
         Schema::create('img_obj', function (Blueprint $table) {
-            $table->increments('id');
+            $table->integer('img_id')->unsigned();
+            $table->integer('obj_id')->unsigned();
             $table->timestamps();
+
+            $table->primary([ 'img_id', 'obj_id' ]);
+            $table->foreign('img_id')->references('id')->on('img');
+            $table->foreign('obj_id')->references('id')->on('obj');
         });
     }
 
