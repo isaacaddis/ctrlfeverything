@@ -104,11 +104,10 @@ an array of the result
 the path is `/api/search`
 
 ### request
-`POST`
+`GET`
+the query string should be `object`
 ```
-{
-    objects: string[]
-}
+/api/search?object=book
 ```
 
 ### response
