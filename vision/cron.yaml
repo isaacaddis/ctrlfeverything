@@ -1,4 +1,0 @@
-cron:
-- description: "Periodic request timestamp"
-  url: /api/img?taken_after=TimeStamp(key_name="TIMESTAMP").put()
-  schedule: every 10 minutes
