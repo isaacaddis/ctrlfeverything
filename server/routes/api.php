@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
+Route::get('/img', 'API\\ImgController@getByTakenAfter');
+Route::post('/img', 'API\\ImgController@create');
+
+Route::post('/objects_of_imgs', 'API\\ImgController@addImgObjRel');
