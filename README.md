@@ -74,14 +74,13 @@ If the operation success the server will return a HTTP response with 200 code, a
 The frontend should retrive the list of objects(for autocomplete) from server, as well as do the search.
 
 ### Autocomplete objects
+Once the `/api/objects` is called, it returns all the objects names in the database.
 the path is `/api/objects`
 
 #### request
 `GET`
-the query string should be `search`
-for example, if the frontend wants to ask for all the objects that contains 'a', the url should be
 ```
-/objects?search=a
+/api/objects
 ```
 
 #### response
