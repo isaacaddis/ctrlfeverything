@@ -17,3 +17,5 @@ Route::get('/img', 'API\\ImgController@getByTakenAfter');
 Route::post('/img', 'API\\ImgController@create');
 
 Route::post('/objects_of_imgs', 'API\\ImgController@addImgObjRel');
+
+Route::get('/objects', 'API\\ObjectController@all');

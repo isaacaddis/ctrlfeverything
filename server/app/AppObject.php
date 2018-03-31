@@ -10,6 +10,6 @@ class AppObject extends Model
     protected $fillable = [ 'name' ];
 
     public function imgs() {
-        return $this->belongsToMany('App\Img');
+        return $this->belongsToMany('App\\Img');
     }
 }
