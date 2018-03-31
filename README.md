@@ -2,14 +2,15 @@
 
 An attempt to make a "CTRL-F" function for your home, made at LA Hacks 2018.
 
-## How cam controllers talk to server
+## How can controllers talk to server
 
 The controller sends new images to server by using HTTP request.
 
 
 the path is `/img`.
 
-### request
+### Request
+
 the method is `POST`, the body is as following.
 ```
 {
@@ -21,7 +22,9 @@ the method is `POST`, the body is as following.
 ```
 `takenAt` should be unix timestamp in ms.
 `img` should be image in jpeg format, encoded in base64.
+
 ### response
+
 On success the server returns with status code 200, with an empty body.
 
 ## How img processing program talks to server
@@ -33,6 +36,7 @@ Generally, the img processing program send a HTTP request to retrieve the img it
 the path is `/img`
 
 #### request
+
 `GET`
 the param should be `take_after` in unix timestamp in ms
 ```
@@ -40,6 +44,7 @@ the param should be `take_after` in unix timestamp in ms
 ```
 
 #### response
+
 ```
 {
     id: string;
@@ -55,6 +60,7 @@ the param should be `take_after` in unix timestamp in ms
 the path is `/objects_of_imgs`
 
 #### request
+
 `POST`
 ```
 {
@@ -65,4 +71,11 @@ the path is `/objects_of_imgs`
 _DONT_ send the raw img back, only send the img id back.
 
 #### response
+
 If the operation success the server will return a HTTP response with 200 code, and empty body.
+
+## Vision
+
+Our vision code is run through the Google Cloud Vision API using Node.js. 
+
+Refer to /vision/, to see the server in its entirety. 
