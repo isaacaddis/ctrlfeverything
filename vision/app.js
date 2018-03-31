@@ -35,50 +35,10 @@ app.get('/', function(req, res) {
     });
     res.end("Hey! Did you mean to issue a specific request?");
 });
-app.get('/api/img', function(req, res) {
-    var take_after = req.query.take_after;
-    var id, img, createdAt, objects;
-    // res.end(take_after);
-    // What url to request?
-    request('/api/img', function(error, response, body) {
-        if (!error && response.statusCode == 200) {
-            /*
-              FORMAT:
-              {
-                  id: string;
-                  img: string;
-                  createdAt: number;
-              }
-            */
-            var json = JSON.parse(body);
-            id = json.id;
-            img = base64Image(json.img);
-            createdAt = json.createdAt;
-            objects = [];
-            client
-                .labelDetection(img)
-                .then(results => {
-                    // res.write('<img width=200 src="' + img + '"><br>');
-                    const labels = results[0].labelAnnotations;
-                    console.log('Labels:');
-                    labels.forEach(label => console.log(label));
-                    labels.forEach(label => objects.push(label));
-                    // res.end('</body></html>');
-                })
-                .catch(err => {
-                    console.error('ERROR:', err);
-                });
-        }
-    });
-});
-
-var i = 0;
-/*
-  Where the main server logic for vision occurs
-*/
+var inc = 100
 function periodic() {
-    i += 1000;
-    var stamp = String(i);
+    inc += 1000;
+    var stamp = String(inc);
     var id;
     var img
     var data, createdAt;
@@ -91,7 +51,7 @@ function periodic() {
     request({
         url: 'https://lahackhack-199707.appspot.com/api/img',
         qs: {
-            "taken_after": stamp
+            "taken_after": inc
         }
     }, function(err, response, body) {
         console.log("Get response: " + response.statusCode);
@@ -99,11 +59,13 @@ function periodic() {
         data = json.data;
         // Start vision client
         var client = new vision.ImageAnnotatorClient();
-        objects = [];
+        
         final = [];
         //Iterated through parsed data
-        for (var i in data) {
+        for (var i =0; i<data.length;i++) {
+            //avoiding looping forever
             if (data.hasOwnProperty(i)) {
+                objects = [];
                 // Initialize temp array, which will be stored in final[][]
                 /*
                   Data structure is as follows:
@@ -121,6 +83,7 @@ function periodic() {
                 var temp = [];
                 id = data[i].id;
                 img = data[i].img;
+                // console.log(img)
                 createdAt = data[i].takenAt;
                 //decode image from base64 string
                 var buf = Buffer.from(img, 'base64');
@@ -131,75 +94,62 @@ function periodic() {
                         const labels = results[0].labelAnnotations;
                         console.log('Labels:');
                         //For testing 
-                        labels.forEach(label => console.log(label));
+                        labels.forEach(label => console.log(label.description));
+                        labels.forEach(label => objects.push(label.description));
+
                         temp.push(id);
                         temp.push(label);
                         final.push(temp);
+
+                        var postData = querystring.stringify({
+
+                                imgId: id,
+                                objects: objects
+                        });
+                        // E.g. query: https://lahackhack-199707.appspot.com/api/objects_of_imgs?imgId=2;objects:smartphone
+                        var options = {
+                            hostname: 'https://lahackhack-199707.appspot.com',
+                            method: 'POST',
+                            path: '/api/objects_of_imgs',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'Content-Length': Buffer.byteLength(postData)
+                            }
+                        };
+                        //Where the POSTing occurs
+                        var sendRequest = function(options) {
+                            that = this;
+                            that.req = http.request(options, function(res) {
+                                // console.log("Request began");
+                                var output = '';
+
+                                res.on('data', function(chunk) {
+                                    output += chunk;
+                                });
+
+                                res.on('end', function() {
+                                    console.log(output);
+                                });
+                            });
+
+                            that.req.on('error', function(err) {
+                                console.log("Server Error");
+                                console.log('Error: ' + err.message);
+                            });
+
+                            that.req.write(postData);
+                            that.req.end();
+                        };
+                        console.log("About to send POST request.");
+                        sendRequest(options);
                     })
                     .catch(err => {
                         console.error('ERROR:', err);
                     });
+
             }
         }
-        console.log(final);
     });
-    /*
-      Now that we've gone through data needed for processing, we now need to send this data
-    */
-    for (var i in final) {
-      /*
-        Final structure is as follows
-        [
-          [id, label],
-          ....
-        ]
-      */
-        var id = final[i][0];
-        var objects = final[i][1];
-
-        var postData = querystring.stringify({
-            data: JSON.stringify({
-                imgId: id,
-                objects: objects
-            })
-        });
-        // E.g. query: https://lahackhack-199707.appspot.com/api/objects_of_imgs?imgId=2;objects:smartphone
-        var options = {
-            hostname: 'https://lahackhack-199707.appspot.com',
-            method: 'POST',
-            path: '/api/objects_of_imgs',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Content-Length': Buffer.byteLength(postData)
-            }
-        };
-        //Where the POSTing occurs
-        var sendRequest = function(options) {
-            that = this;
-            that.req = http.request(options, function(res) {
-                // console.log("Request began");
-                var output = '';
-
-                res.on('data', function(chunk) {
-                    output += chunk;
-                });
-
-                res.on('end', function() {
-                    console.log(output);
-                });
-            });
-
-            that.req.on('error', function(err) {
-                console.log("Server Error");
-                console.log('Error: ' + err.message);
-            });
-
-            that.req.write(postData);
-            that.req.end();
-        };
-
-        sendRequest(options);
-    }
 }
 setInterval(periodic, 1000); //time is in ms
 
