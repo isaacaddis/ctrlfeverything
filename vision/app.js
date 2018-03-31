@@ -63,8 +63,6 @@ function periodic() {
         final = [];
         //Iterated through parsed data
         for (var i =0; i<data.length;i++) {
-            //avoiding looping forever
-            if (data.hasOwnProperty(i)) {
                 objects = [];
                 // Initialize temp array, which will be stored in final[][]
                 /*
@@ -101,7 +99,7 @@ function periodic() {
                         temp.push(label);
                         final.push(temp);
 
-                        var postData = JSON.stringify({"imgId":id,"objects": objects});
+                        var postData = JSON.stringify([{"imgId":id,"objects": objects}]);
                         console.log("Post Data");
                         console.log(postData);    
                         // E.g. query: https://lahackhack-199707.appspot.com/api/objects_of_imgs?imgId=2;objects:smartphone
@@ -147,7 +145,7 @@ function periodic() {
                         console.error('ERROR:', err);
                     });
 
-            }
+            
         }
     });
 }
