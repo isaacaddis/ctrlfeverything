@@ -35,6 +35,7 @@ app.get('/', function(req, res) {
 app.get('/img', function(req, res){
   var take_after = req.query.take_after;
   res.end(take_after);
+  // What url to request?
   request(' ', function (error, response, body) {
     if (!error && response.statusCode == 200) {
       /*
@@ -68,34 +69,34 @@ app.get('/img', function(req, res){
 });
 
 
-app.post('/upload', upload.single('image'), function(req, res, next){
-  // Creates a client
-  const client = new vision.ImageAnnotatorClient();
+// app.post('/upload', upload.single('image'), function(req, res, next){
+//   // Creates a client
+//   const client = new vision.ImageAnnotatorClient();
 
-  /**
-   * TODO(developer): Uncomment the following line before running the sample.
-   */
-  // const fileName = 'Local image file, e.g. /path/to/image.png';
+//   /**
+//    * TODO(developer): Uncomment the following line before running the sample.
+//    */
+//   // const fileName = 'Local image file, e.g. /path/to/image.png';
 
-  // Performs label detection on the local file
+//   // Performs label detection on the local file
 
-  client
-    .labelDetection(req.file.path)
-    .then(results => {
-      res.write('<!DOCTYPE HTML><html><body>');
+//   client
+//     .labelDetection(req.file.path)
+//     .then(results => {
+//       res.write('<!DOCTYPE HTML><html><body>');
 
-      // Base64 the image so we can display it on the page
-	  res.write('<img width=200 src="' + base64Image(req.file.path) + '"><br>');
-      const labels = results[0].labelAnnotations;
-      console.log('Labels:');
-      labels.forEach(label => console.log(JSON.stringify(label, null, 4)));
-      res.end('</body></html>');
-    })
-    .catch(err => {
-      console.error('ERROR:', err);
-    });
-  // [END vision_label_detection]
-});
+//       // Base64 the image so we can display it on the page
+// 	  res.write('<img width=200 src="' + base64Image(req.file.path) + '"><br>');
+//       const labels = results[0].labelAnnotations;
+//       console.log('Labels:');
+//       labels.forEach(label => console.log(JSON.stringify(label, null, 4)));
+//       res.end('</body></html>');
+//     })
+//     .catch(err => {
+//       console.error('ERROR:', err);
+//     });
+//   // [END vision_label_detection]
+// });
 
 app.listen(9090);
 console.log('Server Started');
