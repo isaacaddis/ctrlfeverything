@@ -93,7 +93,9 @@ the path is `/api/objects`
 #### response
 ```
 {
-    data: string[];
+    data: {
+        objects: string[];
+    };
 }
 ```
 an array of the result
