@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Img;
 use App\Http\Resources\ImgResource;
 use App\ImgObject;
+use Ds\Set;
 use Log;
 
 class ImgController extends Controller
@@ -17,6 +18,17 @@ class ImgController extends Controller
             return response('', 400);
         }
         return ImgResource::collection(Img::where('takenAt', '>=', intval($takenAfter))->get());
+    }
+
+    public function getByObjectName(Request $request){
+        $object = $request->query('object');
+        if(!is_string($object)) {
+            return response('', 400);
+        }
+        $imgs = Img::whereHas('objs', function ($query) use ($object) {
+            $query->where('name', $object);
+        })->get();
+        return ImgResource::collection($imgs);
     }
 
     public function create(Request $request) {

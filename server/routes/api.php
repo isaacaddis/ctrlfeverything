@@ -19,3 +19,5 @@ Route::post('/img', 'API\\ImgController@create');
 Route::post('/objects_of_imgs', 'API\\ImgController@addImgObjRel');
 
 Route::get('/objects', 'API\\ObjectController@all');
+
+Route::get('/search', 'API\\ImgController@getByObjectName');
