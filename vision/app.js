@@ -94,21 +94,20 @@ function periodic() {
                         const labels = results[0].labelAnnotations;
                         console.log('Labels:');
                         //For testing 
-                        labels.forEach(label => console.log(label.description));
+                        // labels.forEach(label => console.log(label.description));
                         labels.forEach(label => objects.push(label.description));
 
                         temp.push(id);
                         temp.push(label);
                         final.push(temp);
 
-                        var postData = querystring.stringify({
-
-                                imgId: id,
-                                objects: objects
-                        });
+                        var postData = querystring.stringify({"imgId":id,"objects": objects});
+                        console.log("Post Data");
+                        console.log(postData);    
                         // E.g. query: https://lahackhack-199707.appspot.com/api/objects_of_imgs?imgId=2;objects:smartphone
                         var options = {
-                            hostname: 'https://lahackhack-199707.appspot.com',
+                            hostname: 'lahackhack-199707.appspot.com',
+                            port:80,
                             method: 'POST',
                             path: '/api/objects_of_imgs',
                             headers: {
@@ -140,8 +139,9 @@ function periodic() {
                             that.req.write(postData);
                             that.req.end();
                         };
-                        console.log("About to send POST request.");
+                        // console.log("About to send POST request.");
                         sendRequest(options);
+                        console.log("Sent request to: lahackhack-199707.appspot.com/api/objects_of_imgs");
                     })
                     .catch(err => {
                         console.error('ERROR:', err);
@@ -151,7 +151,7 @@ function periodic() {
         }
     });
 }
-setInterval(periodic, 1000); //time is in ms
+setInterval(periodic, 60000); //time is in ms
 
 app.listen(9090);
 console.log('Server Started');
