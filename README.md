@@ -42,9 +42,11 @@ the param should be `take_after` in unix timestamp in ms
 #### response
 ```
 {
-    id: string;
-    img: string;
-    takenAt: number;
+    data: {
+        id: string;
+        img: string;
+        takenAt: number;
+    }
 }
 ```
 `img` is the base64 code of the img in jpeg format
@@ -84,7 +86,9 @@ for example, if the frontend wants to ask for all the objects that contains 'a',
 
 #### response
 ```
-string[]
+{
+    data: string[];
+}
 ```
 an array of the result
 
@@ -102,12 +106,14 @@ the path is `/api/search`
 ### response
 ```
 {
-    id: number,
-    img: string,
-    deviceName: string,
-    ip: string,
-    takenAt: number,
-}[]
+    data: {
+        id: number,
+        img: string,
+        deviceName: string,
+        ip: string,
+        takenAt: number,
+    }[];
+}
 ```
 `img` is the base64 code for the image in jpeg format
 `takenAt` is the unix timestamp in ms.
