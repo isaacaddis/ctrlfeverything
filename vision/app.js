@@ -101,7 +101,7 @@ function periodic() {
                         temp.push(label);
                         final.push(temp);
 
-                        var postData = querystring.stringify({"imgId":id,"objects": objects});
+                        var postData = JSON.stringify({"imgId":id,"objects": objects});
                         console.log("Post Data");
                         console.log(postData);    
                         // E.g. query: https://lahackhack-199707.appspot.com/api/objects_of_imgs?imgId=2;objects:smartphone
