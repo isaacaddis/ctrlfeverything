@@ -53,7 +53,7 @@ app.post('/upload', upload.single('image'), function(req, res, next){
 	  res.write('<img width=200 src="' + base64Image(req.file.path) + '"><br>');
       const labels = results[0].labelAnnotations;
       console.log('Labels:');
-      labels.forEach(label => res.write(JSON.stringify(label, null, 4)));
+      labels.forEach(label => console.log(JSON.stringify(label, null, 4)));
       res.end('</body></html>');
     })
     .catch(err => {
@@ -62,7 +62,7 @@ app.post('/upload', upload.single('image'), function(req, res, next){
   // [END vision_label_detection]
 });
 
-app.listen(8080);
+app.listen(9090);
 console.log('Server Started');
 
 // Turn image into Base64 so we can display it easily
