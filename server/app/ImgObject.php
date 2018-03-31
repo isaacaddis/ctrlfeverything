@@ -8,4 +8,5 @@ class ImgObject extends Model
 {
     //
     protected $table = 'img_obj';
+    protected $fillable = [ 'img_id', 'obj_id' ];
 }

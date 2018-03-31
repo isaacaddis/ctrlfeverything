@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Img;
 use App\Http\Resources\ImgResource;
+use App\ImgObject;
+use App\Object;
+use Log;
 
 class ImgController extends Controller
 {
@@ -24,6 +27,20 @@ class ImgController extends Controller
         $img->takenAt = intval(floor($request->takenAt));
         $img->deviceName = $request->deviceName;
         $img->save();
+    }
+
+    public function addImgObjRel(Request $request) {
+        foreach($request->input() as $img) {
+            foreach($img['objects'] as $object) {
+                Object::firstOrCreate(array( 'name' => $object ));
+            }
+            $imgId = $img['imgId'];
+            $objectIds = Object::whereIn('name', $img['objects'])->pluck('id')->toArray();
+            foreach($objectIds as $objectId) {
+                ImgObject::firstOrCreate( array( 'img_id' => $imgId, 'obj_id' => $objectId ) );
+            }
+        }
+        return response('', 200);
     }
 
 }
