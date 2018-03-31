@@ -5,7 +5,9 @@ var util = require('util');
 var mime = require('mime');
 var multer = require('multer');
 var upload = multer({dest: 'uploads/'});
+var querystring = require('querystring');
 var request = require('request');
+var http = require('http');
 var config = {
   projectId: 'lahackhack-199707',
   keyFilename: 'LAHack-594fb78d43e9.json'
@@ -15,7 +17,7 @@ var storage = require('@google-cloud/storage')(config);
 var vision = require('@google-cloud/vision');
 var app = express();
 
-// Simple upload form
+// Simple upload form 
 var form = '<!DOCTYPE HTML><html><body>' +
   "<form method='post' action='/upload' enctype='multipart/form-data'>" +
   "<input type='file' name='image'/>" +
@@ -32,11 +34,12 @@ app.get('/', function(req, res) {
   });
   res.end("Hey! Did you mean to issue a specific request?");
 });
-app.get('/img', function(req, res){
+app.get('/api/img', function(req, res){
   var take_after = req.query.take_after;
-  res.end(take_after);
+  var id, img, createdAt,objects;
+  // res.end(take_after);
   // What url to request?
-  request(' ', function (error, response, body) {
+  request('/api/img', function (error, response, body) {
     if (!error && response.statusCode == 200) {
       /*
         FORMAT:
@@ -46,20 +49,20 @@ app.get('/img', function(req, res){
             createdAt: number;
         }
       */
-      var id = response.id;
-      var img = base64Image(response.img);
-      var createdAt = response.createdAt;
+      var json = JSON.parse(body);
+      id = json.id;
+      img = base64Image(json.img);
+      createdAt = json.createdAt;
+      objects =[];
         client
           .labelDetection(img)
           .then(results => {
-            res.write('<!DOCTYPE HTML><html><body>');
-
-            // Base64 the image so we can display it on the page
-          res.write('<img width=200 src="' + img + '"><br>');
+          // res.write('<img width=200 src="' + img + '"><br>');
             const labels = results[0].labelAnnotations;
-            console.log('Labels:');
-            labels.forEach(label => console.log(JSON.stringify(label, null, 4)));
-            res.end('</body></html>');
+            console.log('Labels:'); 
+            labels.forEach(label => console.log(label));
+            labels.forEach(label => objects.push(label));
+            // res.end('</body></html>');
           })
           .catch(err => {
             console.error('ERROR:', err);
@@ -67,7 +70,71 @@ app.get('/img', function(req, res){
     }
   });
 });
+var id, img, createdAt,objects;
+function periodic() {
+  var stamp = String((new Date).getTime());
+  request({url:'lahackhack-199707.appspot.com/api/img', qs:"taken_after="+stamp}, function(err, response, body) {
+    if(err) { console.log(err); return; }
+    console.log("Get response: " + response.statusCode);
+    var json = JSON.parse(body);
+    id = json.id;
+    img = base64Image(json.img);
+    createdAt = json.createdAt;
+    objects =[];
+      client
+        .labelDetection(img)
+        .then(results => {
+        // res.write('<img width=200 src="' + img + '"><br>');
+          const labels = results[0].labelAnnotations;
+          console.log('Labels:'); 
+          labels.forEach(label => console.log(label));
+          labels.forEach(label => objects.push(label));
+          // res.end('</body></html>');
+        })
+        .catch(err => {
+          console.error('ERROR:', err);
+        }); 
+  });
+  var postData = querystring.stringify({data:JSON.stringify ({imgId:id,objects:objects})});
+  var options = {
+      hostname: 'lahackhack-199707.appspot.com',
+      method: 'POST',
+      path: '/api/objects_of_imgs',
+      headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Length': Buffer.byteLength(postData)
+      }
+  };
+  var sendRequest = function(options)
+  {
+      that = this;
+      that.req = http.request(options,function(res)
+      {
+          // console.log("Request began");
+          var output = '';
 
+          res.on('data', function (chunk) {
+              output += chunk;
+          });
+
+          res.on('end', function () {
+              console.log(output);
+          });
+      });
+
+      that.req.on('error', function (err)
+      {
+          console.log("Server Error");
+          console.log('Error: ' + err.message);
+      });
+
+      that.req.write(postData);
+      that.req.end();
+  };
+
+  sendRequest(options);
+}
+setInterval(periodic, 1000); //time is in ms
 
 // app.post('/upload', upload.single('image'), function(req, res, next){
 //   // Creates a client
