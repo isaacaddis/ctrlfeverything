@@ -59,7 +59,6 @@ function periodic() {
         data = json.data;
         // Start vision client
         var client = new vision.ImageAnnotatorClient();
-        
         final = [];
         //Iterated through parsed data
         for (var i =0; i<data.length;i++) {
@@ -95,9 +94,9 @@ function periodic() {
                         // labels.forEach(label => console.log(label.description));
                         labels.forEach(label => objects.push(label.description));
 
-                        temp.push(id);
-                        temp.push(label);
-                        final.push(temp);
+                        // temp.push(id);
+                        // temp.push(label);
+                        // final.push(temp);
 
                         var postData = JSON.stringify([{"imgId":id,"objects": objects}]);
                         console.log("Post Data");
