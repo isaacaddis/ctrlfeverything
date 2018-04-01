@@ -1,0 +1,4 @@
+cron:
+- description: "retrive images and find objects regulaly"
+  url: /tasks/find_objects_on_imgs
+  schedule: every 1 minutes

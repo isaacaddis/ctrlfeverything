@@ -1,6 +1,11 @@
 const http = require('http');
 const request = require('request');
 
+const express = require('express');
+const app = express();
+
+const port = process.env.PORT || '8080';
+
 const config = {
     projectId: 'lahackhack-199707',
     keyFileName: 'LAHack-594fb78d43e9.json',
@@ -27,6 +32,7 @@ function getLabelsAsync(imgBase64) {
 
 
 function getImages(takenAfter, cb) {
+    console.log(`retrieving images since ${takenAfter}`);
     request({
         url: `${host}/img`,
         qs: { "taken_after": takenAfter }
@@ -37,11 +43,15 @@ function getImages(takenAfter, cb) {
 }
 
 function getTakenAfter(cb) {
-    cb(0);
+    request({
+        url: `${host}/latest_process_time`,
+    }, function(err, res, body) {
+        cb(JSON.parse(body).data);
+    });
 }
 
-function main() {
-    getTakenAfter(takenAfter => getImages(takenAfter, images => {
+function mainAsync() {
+    return new Promise((res, rej) => getTakenAfter(takenAfter => getImages(takenAfter, images => {
         const promises = images.map(img => {
             const id = img.id;
             const imgBase64 = img.img;
@@ -50,7 +60,7 @@ function main() {
                 objects,
             }));
         });
-        Promise.all(promises).then(body => {
+        res(Promise.all(promises).then(body => {
             request({
                 url: `${host}/objects_of_imgs`,
                 headers: {
@@ -63,8 +73,15 @@ function main() {
             if(err) {
                 throw new Error(err);
             }
-        })).then(() => console.log("update image object relation done!")).catch(err => console.log(err));
-    }));
+        })));
+    })));
 }
 
-main();
+app.get('/tasks/find_objects_on_imgs', (req, res) => {
+    mainAsync().then(() => console.log('task done!')).then(() => res.status(200).end()).catch(err => {
+        res.status(500).send(JSON.stringify(err)).end();
+        console.log(err);
+    });
+});
+
+http.createServer(app).listen(port);
