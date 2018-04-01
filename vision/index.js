@@ -32,6 +32,7 @@ function getLabelsAsync(imgBase64) {
 
 
 function getImages(takenAfter, cb) {
+    console.log(`retrieving images since ${takenAfter}`);
     request({
         url: `${host}/img`,
         qs: { "taken_after": takenAfter }
@@ -42,7 +43,11 @@ function getImages(takenAfter, cb) {
 }
 
 function getTakenAfter(cb) {
-    cb(0);
+    request({
+        url: `${host}/latest_process_time`,
+    }, function(err, res, body) {
+        cb(JSON.parse(body).data);
+    });
 }
 
 function mainAsync() {
