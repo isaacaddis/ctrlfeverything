@@ -2,7 +2,7 @@
 
 An attempt to make a "CTRL-F" function for your home, made at LA Hacks 2018.
 
-[Img](https://github.com/isaacaddis/ctrlfeverything/blob/master/img.png)
+(Img)[https://github.com/isaacaddis/ctrlfeverything/blob/master/img.png]
 
 ## How can controllers talk to server
 
