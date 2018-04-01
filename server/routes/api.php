@@ -21,3 +21,5 @@ Route::post('/objects_of_imgs', 'API\\ImgController@addImgObjRel');
 Route::get('/objects', 'API\\ObjectController@all');
 
 Route::get('/search', 'API\\ImgController@getByObjectName');
+
+Route::get('/latest_process_time', 'API\\ImgController@latestProcessTime');
