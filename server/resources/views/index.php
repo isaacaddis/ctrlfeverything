@@ -125,7 +125,7 @@
                 <form>
                   <div class="mdl-textfield mdl-js-textfield" style="padding-left: 14px; padding-right: 0px; padding-top: 14px;">
                         <input class="mdl-textfield__input" type="text" aria-label="object" aria-describedby="search-button" id="keyword" placeholder="Search Object" style="padding-left: 40px; padding-right: 8px; padding-bottom: 5px; color: rgba(255, 255, 255, 1);">
-                            <button class="mdl-button mdl-js-button mdl-button--icon" id="search-button" onclick="search()">
+                            <button type="button" class="mdl-button mdl-js-button mdl-button--icon" id="search-button" onclick="search()">
                                 <i class="material-icons" id="search-button" style="color: rgba(255, 255, 255, 1);">search</i>
                             </button>
                     </div>
@@ -167,7 +167,12 @@
             $(function() {
                 $.ajax({url: "https://lahackhack-199707.appspot.com/api/objects"}).done(function(data) {
                     source = data;
-                    $("#keyword").autocomplete({"source": data["data"]["objects"]});
+                    $("#keyword").autocomplete({"source": data["data"]["objects"]})
+                        .keyup(function (e) {
+                            if(e.which === 13) {
+                                $(".ui-menu-item").hide();
+                            }            
+                        });
                 });
                 window.addEventListener("keydown",function (e) {
                     console.log(e);
@@ -185,11 +190,6 @@
                 $.ajax({
                     url: "https://lahackhack-199707.appspot.com/api/search?object=" + $("#keyword").val()
                 }).done(function(data) {
-                    $("#form").animate({
-                        "padding-top": "10px"
-                      }, 300, function() {
-                        // Animation complete.
-                      });
                     renderResult(data["data"]);
                 });
             }
@@ -205,7 +205,7 @@
                     html += '</div></div>';
                     elements.push(html);
                 }
-                html = '<div style="padding-top: 20px; margin-top: 30px; background-color: white; border-radius: 5px; box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4)">';
+                html = '<div style="padding-top: 20px; padding-bottom: 20px; margin-top: 30px; background-color: white; border-radius: 5px; box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.4)">';
                 if (data.length != 0)
                     html += elements.join('<hr style="width: 100%">');
                 else
