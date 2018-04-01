@@ -2,6 +2,8 @@
 
 An attempt to make a "CTRL-F" function for your home, made at LA Hacks 2018.
 
+![Img](https://github.com/isaacaddis/ctrlfeverything/blob/master/img.png "Title 1")
+
 ## How can controllers talk to server
 
 The controller sends new images to server by using HTTP request.
