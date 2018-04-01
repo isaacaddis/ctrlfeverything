@@ -54,4 +54,8 @@ class ImgController extends Controller
         return response('', 200);
     }
 
+    public function latestProcessTime(Request $request) {
+        return response()->json(array('data' => strtotime(ImgObject::max('created_at')) * 1000));
+    }
+
 }
