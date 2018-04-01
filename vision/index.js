@@ -73,7 +73,10 @@ function mainAsync() {
 }
 
 app.get('/tasks/find_objects_on_imgs', (req, res) => {
-    mainAsync().then(() => console.log('task done!')).then(() => res.status(200).end()).catch(err => res.status(500).end(JSON.stringify(err)));
+    mainAsync().then(() => console.log('task done!')).then(() => res.status(200).end()).catch(err => {
+        res.status(500).send(JSON.stringify(err)).end();
+        console.log(err);
+    });
 });
 
 http.createServer(app).listen(port);
