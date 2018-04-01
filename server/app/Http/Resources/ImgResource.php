@@ -22,6 +22,8 @@ class ImgResource extends JsonResource
             'id' => $this->id,
             'img' => $this->img,
             'takenAt' => $this->takenAt,
+            'ip' => $this->ip,
+            'deviceName' => $this->deviceName,
         ];
     }
 }
