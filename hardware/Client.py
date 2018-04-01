@@ -23,17 +23,14 @@ cam.start()
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((TCP_IP, TCP_PORT))
 
-
+s.send(deviceName.encode('utf-8'))
 #while True:
 for x in range(0,1):
-    test = "test here"
     imageJpg = cam.get_image()
     pygame.image.save(imageJpg,"pic.jpg")
-    with open("pic.jpg","rb") as openImage:
-        img=base64.b64encode(openImage.read())
-    takenAt=int(round(time.time()*1000))
-    s.send(takenAt.encode('utf-8'))
-    s.send(test.encode('utf-8'))
-
-
+    imageData = open("pic.jpg","rb").read()
+    size = len(imageData)
+    s.recv(1)
+    s.sendall(str(size))
+    s.sendall(imageData)
 s.close()
